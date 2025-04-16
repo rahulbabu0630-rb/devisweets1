@@ -81,8 +81,19 @@ const EmployeeAttendanceDashboard = () => {
       setLoading(true);
       setError(null);
       
+<<<<<<< HEAD
       const response = await fetch('http://localhost:8080/attendance/all-today-status', {
         credentials: 'include'
+=======
+      const apiUrl = `${import.meta.env.VITE_API_BASE_URL}/attendance/all-today-status`;
+      
+      const response = await fetch(apiUrl, {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache'
+        }
+>>>>>>> 26f3e65 (updated url from local host to backend api)
       });
       
       if (!response.ok) {
@@ -106,12 +117,16 @@ const EmployeeAttendanceDashboard = () => {
       
       setAttendanceData(processedData);
     } catch (err) {
-      console.error('Error fetching attendance:', err);
-      setError(err.message);
-      toast.error(`Error: ${err.message}`, { 
-        position: "top-center",
-        autoClose: 5000
+      console.error('Error fetching attendance:', err);const apiUrl = `${import.meta.env.VITE_API_BASE_URL}/attendance/all-today-status`;
+
+      const response = await fetch(apiUrl, {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache'
+        }
       });
+      
     } finally {
       setLoading(false);
     }
@@ -212,7 +227,10 @@ const EmployeeAttendanceDashboard = () => {
       
       const handleResize = () => {
         chart.resize();
+<<<<<<< HEAD
         // Update font sizes on resize
+=======
+>>>>>>> 26f3e65 (updated url from local host to backend api)
         option.legend.textStyle.fontSize = window.innerWidth < 768 ? 10 : 12;
         option.series[0].emphasis.label.fontSize = window.innerWidth < 768 ? '14' : '18';
         chart.setOption(option);
@@ -230,7 +248,11 @@ const EmployeeAttendanceDashboard = () => {
   // Initial data fetch with auto-refresh
   useEffect(() => {
     fetchAttendanceData();
+<<<<<<< HEAD
     const interval = setInterval(fetchAttendanceData, 300000);
+=======
+    const interval = setInterval(fetchAttendanceData, 300000); // Refresh every 5 minutes
+>>>>>>> 26f3e65 (updated url from local host to backend api)
     return () => clearInterval(interval);
   }, [fetchAttendanceData]);
 
@@ -240,7 +262,11 @@ const EmployeeAttendanceDashboard = () => {
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
+<<<<<<< HEAD
   // Export to PDF with seablue theme
+=======
+  // Export to PDF
+>>>>>>> 26f3e65 (updated url from local host to backend api)
   const exportToPDF = useCallback(() => {
     try {
       toast.info('Preparing PDF export...', { autoClose: 2000 });
@@ -322,6 +348,7 @@ const EmployeeAttendanceDashboard = () => {
 
   // Export to CSV
   const exportToCSV = useCallback(() => {
+<<<<<<< HEAD
     const headers = ['Employee ID', 'Name', 'Status'];
     const csvContent = [
       headers.join(','),
@@ -337,17 +364,57 @@ const EmployeeAttendanceDashboard = () => {
     link.href = URL.createObjectURL(blob);
     link.download = `attendance-${new Date().toISOString().slice(0, 10)}.csv`;
     link.click();
+=======
+    try {
+      toast.info('Preparing CSV export...', { autoClose: 2000 });
+      
+      const headers = ['Employee ID', 'Name', 'Status'];
+      const csvContent = [
+        headers.join(','),
+        ...filteredData.map(item => [
+          item.employeeId,
+          `"${item.employeeName.replace(/"/g, '""')}"`,
+          item.status
+        ].join(','))
+      ].join('\n');
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `attendance-${new Date().toISOString().slice(0, 10)}.csv`;
+      link.click();
+      
+      toast.success('CSV exported successfully!');
+    } catch (err) {
+      console.error('Error exporting CSV:', err);
+      toast.error(`Failed to export CSV: ${err.message}`);
+    }
+>>>>>>> 26f3e65 (updated url from local host to backend api)
   }, [filteredData]);
 
   // Loading skeleton for table
   const TableSkeleton = () => (
     <div className="space-y-4 animate-pulse">
+<<<<<<< HEAD
       {[...Array(5)].map((_, i) => (
         <div key={i} className="h-12 bg-gray-200 rounded"></div>
+=======
+      <div className="h-12 bg-gray-200 rounded"></div>
+      {[...Array(4)].map((_, i) => (
+        <div key={i} className="grid grid-cols-3 gap-4">
+          <div className="h-12 bg-gray-100 rounded"></div>
+          <div className="h-12 bg-gray-100 rounded"></div>
+          <div className="h-12 bg-gray-100 rounded"></div>
+        </div>
+>>>>>>> 26f3e65 (updated url from local host to backend api)
       ))}
     </div>
   );
 
+
+
+
+>>>>>>> 26f3e65 (updated url from local host to backend api)
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 p-2 md:p-4 lg:p-6">
       <div className="bg-white rounded-lg shadow-md p-2 md:p-4 lg:p-6">
@@ -573,9 +640,13 @@ const EmployeeAttendanceDashboard = () => {
           <div className="w-full lg:w-1/3 bg-gradient-to-br from-blue-50 to-cyan-50 p-3 md:p-4 rounded-lg border border-blue-100">
             <h2 className="text-base md:text-lg font-semibold text-gray-800 mb-3 md:mb-4">Attendance Distribution</h2>
             {loading ? (
+<<<<<<< HEAD
               <div className="flex justify-center items-center h-48 md:h-64">
                 <div className="animate-spin rounded-full h-10 w-10 md:h-12 md:w-12 border-t-2 border-b-2 border-blue-500"></div>
               </div>
+=======
+              <ChartSkeleton />
+>>>>>>> 26f3e65 (updated url from local host to backend api)
             ) : filteredData.length === 0 ? (
               <div className="flex justify-center items-center h-48 md:h-64 text-gray-500 text-sm md:text-base">
                 No data available for chart
