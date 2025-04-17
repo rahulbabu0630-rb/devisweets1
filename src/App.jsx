@@ -24,7 +24,7 @@ const AppContent = () => {
         <Route path="/about" element={<AboutUs />} />
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/attendance" element={<AttendancePage />} />
-        <Route path="/contact-us" element={<ContactUs />} />
+      //<Route path="/contact-us" element={<ContactUs />} />
         <Route path="/mark-attendance/:id" element={<MarkAttendance />} />
         <Route path="/attendance-summary" element={<AttendanceSummary />} />
         <Route path="/attendance-summary/:employeeId" element={<AttendanceSummary />} />
