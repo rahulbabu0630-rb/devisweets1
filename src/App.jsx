@@ -10,6 +10,7 @@ import AttendanceSummary from "./components/AttendanceSummary/AttendanceSummary"
 import EmployeeDirectory from "./components/EmployeeManagement/EmployeeDirectory";
 import AddEmployee from "./components/EmployeeManagement/AddEmployee";
 import EmployeeProfile from "./components/EmployeeManagement/EmployeeProfile";
+import ContactUs from "./components/ContactUs";
 import BulkAttendancePage from "./components/BulkManagement/BulkAttendancePage";
 
 import EmployeeAttendanceDashboard from "./components/EmployeeDashboard/EmployeeAttendanceDashboard";
@@ -24,7 +25,7 @@ const AppContent = () => {
         <Route path="/about" element={<AboutUs />} />
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/attendance" element={<AttendancePage />} />
-      
+        <Route path="/contact-us" element={<ContactUs />} />
         <Route path="/mark-attendance/:id" element={<MarkAttendance />} />
         <Route path="/attendance-summary" element={<AttendanceSummary />} />
         <Route path="/attendance-summary/:employeeId" element={<AttendanceSummary />} />
