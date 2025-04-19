@@ -94,8 +94,7 @@ const EmployeeAttendanceDashboard = () => {
       });
       
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
       
       const data = await response.json();
@@ -118,14 +117,8 @@ const EmployeeAttendanceDashboard = () => {
       setAttendanceData(processedData);
     } catch (err) {
       console.error('Error fetching attendance:', err);
-      let errorMessage = err.message;
-      
-      if (err.message === 'Failed to fetch') {
-        errorMessage = 'Network error - Please check your connection';
-      }
-      
-      setError(errorMessage);
-      toast.error(`Error: ${errorMessage}`, { 
+      setError(err.message || 'Failed to fetch attendance data');
+      toast.error(`Error: ${err.message}`, { 
         position: "top-center",
         autoClose: 5000
       });
