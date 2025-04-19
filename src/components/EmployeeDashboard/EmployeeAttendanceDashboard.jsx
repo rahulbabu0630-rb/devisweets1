@@ -48,7 +48,9 @@ const EmployeeAttendanceDashboard = () => {
       const term = searchTerm.toLowerCase();
       result = result.filter(item =>
         item.employeeName.toLowerCase().includes(term) ||
-        String(item.employeeId).includes(term)
+        String(item.employeeId).includes(term) ||
+        item.department?.toLowerCase().includes(term) ||
+        item.position?.toLowerCase().includes(term)
       );
     }
     
@@ -102,12 +104,15 @@ const EmployeeAttendanceDashboard = () => {
         throw new Error('Invalid data format received');
       }
       
-      // Process the data
+      // Process the data to match your component's structure
       const processedData = data.map(item => ({
         employeeId: item.employeeId,
         employeeName: item.employeeName,
         status: item.attendanceStatus.toLowerCase() === 'halfday' ? 'half-day' : item.attendanceStatus.toLowerCase(),
-        date: item.currentDate
+        date: item.currentDate,
+        department: item.department || 'N/A',
+        position: item.position || 'N/A',
+        lastCheckIn: item.lastCheckIn || null
       }));
       
       setAttendanceData(processedData);
@@ -143,7 +148,7 @@ const EmployeeAttendanceDashboard = () => {
     });
   };
 
-  // Initialize or update chart with seablue gradient
+  // Initialize or update chart
   useEffect(() => {
     if (filteredData.length > 0 && chartRef.current) {
       const chart = echarts.getInstanceByDom(chartRef.current) || echarts.init(chartRef.current);
@@ -240,15 +245,39 @@ const EmployeeAttendanceDashboard = () => {
 
   // Initial data fetch with auto-refresh
   useEffect(() => {
-    fetchAttendanceData();
-    const interval = setInterval(fetchAttendanceData, 300000); // Refresh every 5 minutes
-    return () => clearInterval(interval);
+    const fetchData = async () => {
+      await fetchAttendanceData();
+    };
+    
+    fetchData(); // Initial fetch
+    
+    const interval = setInterval(fetchData, 300000); // 5 minutes
+    
+    // Add visibility change listener
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchData(); // Refresh when tab becomes visible
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [fetchAttendanceData]);
 
   // Format date for display
   const formatDate = (dateString) => {
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
+  // Format time for display
+  const formatTime = (timeString) => {
+    if (!timeString) return '--';
+    return new Date(timeString).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
   // Export to PDF
@@ -286,11 +315,14 @@ const EmployeeAttendanceDashboard = () => {
       doc.text(`Total Employees: ${summary.total}`, 14, 105);
       
       // Table data
-      const headers = [['Employee ID', 'Name', 'Status']];
+      const headers = [['ID', 'Name', 'Department', 'Position', 'Status', 'Last Check-In']];
       const rows = filteredData.map(item => [
         item.employeeId,
         item.employeeName,
-        item.status.charAt(0).toUpperCase() + item.status.slice(1)
+        item.department,
+        item.position,
+        item.status.charAt(0).toUpperCase() + item.status.slice(1),
+        item.lastCheckIn ? formatTime(item.lastCheckIn) : '--'
       ]);
       
       // Add table
@@ -307,7 +339,7 @@ const EmployeeAttendanceDashboard = () => {
           fillColor: [240, 248, 255]
         },
         didParseCell: (data) => {
-          if (data.column.index === 2) {
+          if (data.column.index === 4) { // Status column
             const status = data.cell.raw.toLowerCase();
             if (status === 'present') {
               data.cell.styles.fillColor = [224, 242, 254];
@@ -336,13 +368,16 @@ const EmployeeAttendanceDashboard = () => {
     try {
       toast.info('Preparing CSV export...', { autoClose: 2000 });
       
-      const headers = ['Employee ID', 'Name', 'Status'];
+      const headers = ['Employee ID', 'Name', 'Department', 'Position', 'Status', 'Last Check-In'];
       const csvContent = [
         headers.join(','),
         ...filteredData.map(item => [
           item.employeeId,
           `"${item.employeeName.replace(/"/g, '""')}"`,
-          item.status
+          `"${item.department.replace(/"/g, '""')}"`,
+          `"${item.position.replace(/"/g, '""')}"`,
+          item.status,
+          item.lastCheckIn ? formatTime(item.lastCheckIn) : '--'
         ].join(','))
       ].join('\n');
 
@@ -373,7 +408,7 @@ const EmployeeAttendanceDashboard = () => {
     </div>
   );
 
-  // Chart loading skeleton
+  // Chart skeleton for loading state
   const ChartSkeleton = () => (
     <div className="flex justify-center items-center h-48 md:h-64">
       <div className="animate-spin rounded-full h-10 w-10 md:h-12 md:w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -574,7 +609,7 @@ const EmployeeAttendanceDashboard = () => {
               </div>
               <input
                 type="text"
-                placeholder="Search by name or ID..."
+                placeholder="Search by name, ID, department or position..."
                 className="pl-10 pr-4 py-2 w-full border border-blue-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm md:text-base"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -634,8 +669,9 @@ const EmployeeAttendanceDashboard = () => {
                   <thead className="bg-gradient-to-r from-blue-50 to-cyan-50">
                     <tr>
                       <th className="px-3 md:px-6 py-2 md:py-3 text-left text-xs md:text-sm font-medium text-blue-800 uppercase tracking-wider">ID</th>
-                      <th className="px-3 md:px-6 py-2 md:py-3 text-left text-xs md:text-sm font-medium text-blue-800 uppercase tracking-wider">Name</th>
+                      <th className="px-3 md:px-6 py-2 md:py-3 text-left text-xs md:text-sm font-medium text-blue-800 uppercase tracking-wider">Employee</th>
                       <th className="px-3 md:px-6 py-2 md:py-3 text-left text-xs md:text-sm font-medium text-blue-800 uppercase tracking-wider">Status</th>
+                      <th className="px-3 md:px-6 py-2 md:py-3 text-left text-xs md:text-sm font-medium text-blue-800 uppercase tracking-wider">Last Check-In</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-blue-50">
@@ -649,8 +685,15 @@ const EmployeeAttendanceDashboard = () => {
                           <td className="px-3 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm text-gray-900">
                             {employee.employeeId}
                           </td>
-                          <td className="px-3 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm font-medium text-gray-900">
-                            {employee.employeeName}
+                          <td className="px-3 md:px-6 py-2 md:py-4 whitespace-nowrap">
+                            <div className="flex flex-col">
+                              <span className="text-xs md:text-sm font-medium text-gray-900">
+                                {employee.employeeName}
+                              </span>
+                              <span className="text-xs text-gray-500">
+                                {employee.department} • {employee.position}
+                              </span>
+                            </div>
                           </td>
                           <td className="px-3 md:px-6 py-2 md:py-4 whitespace-nowrap">
                             <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
@@ -662,6 +705,9 @@ const EmployeeAttendanceDashboard = () => {
                             }`}>
                               {statusDisplay}
                             </span>
+                          </td>
+                          <td className="px-3 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm text-gray-500">
+                            {formatTime(employee.lastCheckIn)}
                           </td>
                         </tr>
                       );
