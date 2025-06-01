@@ -334,7 +334,7 @@ const BulkAttendancePage = () => {
 
             {/* Nav items - Updated for better mobile view */}
             <div className={`${isMobile ? 'absolute right-2 space-x-1' : 'absolute right-4 space-x-4'} flex items-center`}>
-              <button 
+{/*               <button 
                 onClick={() => navigate('/employee-dashboard')}
                 className={`flex items-center ${isMobile ? 'p-1 text-xs' : 'px-3 py-1 text-sm'} bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all duration-300`}
               >
@@ -344,7 +344,7 @@ const BulkAttendancePage = () => {
               <button 
                 onClick={handleLogoClick}
                 className={`flex items-center ${isMobile ? 'p-1 text-xs' : 'px-3 py-1 text-sm'} bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all duration-300`}
-              >
+              > */}
                 <FaArrowLeft className={isMobile ? '' : 'mr-1'} />
                 {!isMobile && <span>Back to Attendance</span>}
               </button>
