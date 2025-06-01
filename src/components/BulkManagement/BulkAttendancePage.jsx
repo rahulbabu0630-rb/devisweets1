@@ -340,14 +340,14 @@ const BulkAttendancePage = () => {
               >
                 <FaUsers className={isMobile ? 'text-sm' : 'mr-1'} />
                 {!isMobile && <span>Employee Dashboard</span>}
-              </button>
+              </button> */}
               <button 
                 onClick={handleLogoClick}
                 className={`flex items-center ${isMobile ? 'p-1 text-xs' : 'px-3 py-1 text-sm'} bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all duration-300`}
-              > */}
-{/*                 <FaArrowLeft className={isMobile ? '' : 'mr-1'} />
+              > 
+               <FaArrowLeft className={isMobile ? '' : 'mr-1'} />
                 {!isMobile && <span>Back to Attendance</span>}
-              </button> */}
+              </button> 
             </div>
           </div>
         </div>
