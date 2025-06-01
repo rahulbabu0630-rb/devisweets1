@@ -13,7 +13,6 @@ import EmployeeProfile from "./components/EmployeeManagement/EmployeeProfile";
 import ContactUs from "./components/ContactUs";
 import BulkAttendancePage from "./components/BulkManagement/BulkAttendancePage";
 
-import EmployeeAttendanceDashboard from "./components/EmployeeDashboard/EmployeeAttendanceDashboard";
 
 const AppContent = () => {
   const location = useLocation();
@@ -33,7 +32,6 @@ const AppContent = () => {
         <Route path="/add-employee" element={<AddEmployee />} />
         <Route path="/employee-profile/:name" element={<EmployeeProfile />} />
         <Route path="/bulk-attendance" element={<BulkAttendancePage />} />
-        <Route path="/employee-dashboard" element={<EmployeeAttendanceDashboard />} />
       </Routes>
       {/* ToastContainer should be here, at the root level */}
       <ToastContainer
